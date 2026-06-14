@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+aiosqlite
+anthropic
+python-multipart
+pillow
