@@ -117,11 +117,18 @@
               <table class="w-full text-sm">
                 <thead>
                   <tr class="bg-gray-50 text-left text-gray-600 text-xs uppercase tracking-wide">
-                    <th class="px-3 py-2 rounded-l">Product</th>
                     <th class="px-3 py-2">Brand</th>
+                    <th class="px-3 py-2">Name</th>
+                    <th class="px-3 py-2">Pack</th>
+                    <th class="px-3 py-2">Size</th>
+                    <th class="px-3 py-2">Category</th>
+                    <th class="px-3 py-2">Placement</th>
+                    <th class="px-3 py-2">Price/Unit</th>
+                    <th class="px-3 py-2">Price/Ltr</th>
+                    <th class="px-3 py-2">Facings</th>
                     <th class="px-3 py-2">Units</th>
                     <th class="px-3 py-2">Shelf %</th>
-                    <th class="px-3 py-2 rounded-r">Confidence</th>
+                    <th class="px-3 py-2">Conf.</th>
                   </tr>
                 </thead>
                 <tbody id="analysis-table-body" class="divide-y divide-gray-100"></tbody>
@@ -178,50 +185,32 @@
 
     <!-- ── PRODUCTS TAB ── -->
     <div id="tab-products" class="tab-content hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="bg-white rounded-xl shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4">Add / Update Product</h2>
-          <div class="space-y-3">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Product Name</label>
-              <input id="prod-name" type="text" placeholder="e.g. Orange Juice 1L"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Brand</label>
-              <input id="prod-brand" type="text" placeholder="e.g. Tropicana"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Unit Price ($)</label>
-              <input id="prod-price" type="number" step="0.01" min="0" placeholder="0.00"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-            <button onclick="upsertProduct()"
-              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition text-sm">
-              Save Product
-            </button>
+      <div class="bg-white rounded-xl shadow p-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-800">Product Master Data</h2>
+            <p class="text-xs text-gray-500 mt-0.5">Populated automatically from shelf photo analysis — no manual entry needed.</p>
           </div>
-          <div id="prod-error" class="mt-3 hidden text-red-600 text-sm bg-red-50 border border-red-200 rounded-lg p-3"></div>
-          <div id="prod-success" class="mt-3 hidden text-green-700 text-sm bg-green-50 border border-green-200 rounded-lg p-3"></div>
+          <button onclick="loadProducts()" class="text-xs text-indigo-600 hover:underline">Refresh</button>
         </div>
-
-        <div class="bg-white rounded-xl shadow p-6">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4">Product Catalog</h2>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="bg-gray-50 text-left text-gray-600 text-xs uppercase tracking-wide">
-                  <th class="px-3 py-2 rounded-l">Name</th>
-                  <th class="px-3 py-2">Brand</th>
-                  <th class="px-3 py-2 rounded-r">Unit Price</th>
-                </tr>
-              </thead>
-              <tbody id="products-table-body" class="divide-y divide-gray-100"></tbody>
-            </table>
-          </div>
-          <p id="products-empty" class="text-sm text-gray-400 mt-4 text-center hidden">No products yet.</p>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-gray-50 text-left text-gray-600 text-xs uppercase tracking-wide">
+                <th class="px-3 py-2">Brand</th>
+                <th class="px-3 py-2">Name</th>
+                <th class="px-3 py-2">SKU Code</th>
+                <th class="px-3 py-2">Pack</th>
+                <th class="px-3 py-2">Size</th>
+                <th class="px-3 py-2">Unit</th>
+                <th class="px-3 py-2">Category</th>
+                <th class="px-3 py-2">Placement</th>
+              </tr>
+            </thead>
+            <tbody id="products-table-body" class="divide-y divide-gray-100"></tbody>
+          </table>
         </div>
+        <p id="products-empty" class="text-sm text-gray-400 mt-4 text-center hidden">No products yet. Upload a shelf photo to auto-populate the catalog.</p>
       </div>
     </div>
 
@@ -267,12 +256,15 @@
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 text-left text-gray-600 text-xs uppercase tracking-wide">
-                <th class="px-3 py-2 rounded-l">Product</th>
                 <th class="px-3 py-2">Brand</th>
+                <th class="px-3 py-2">Product</th>
+                <th class="px-3 py-2">Pack</th>
+                <th class="px-3 py-2">Category</th>
                 <th class="px-3 py-2">Period</th>
                 <th class="px-3 py-2">Units Sold</th>
+                <th class="px-3 py-2">Price/Unit</th>
+                <th class="px-3 py-2">Revenue Est.</th>
                 <th class="px-3 py-2">Replenishment</th>
-                <th class="px-3 py-2 rounded-r">Revenue Est.</th>
               </tr>
             </thead>
             <tbody id="sales-table-body" class="divide-y divide-gray-100"></tbody>
@@ -293,10 +285,16 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="bg-gray-50 text-left text-gray-600 text-xs uppercase tracking-wide">
-                  <th class="px-3 py-2 rounded-l">Product</th>
                   <th class="px-3 py-2">Brand</th>
-                  <th class="px-3 py-2">Shelf %</th>
-                  <th class="px-3 py-2 rounded-r">Units</th>
+                  <th class="px-3 py-2">Product</th>
+                  <th class="px-3 py-2">Pack</th>
+                  <th class="px-3 py-2">Size</th>
+                  <th class="px-3 py-2">Placement</th>
+                  <th class="px-3 py-2">Price/Unit</th>
+                  <th class="px-3 py-2">Price/Ltr</th>
+                  <th class="px-3 py-2">Facings</th>
+                  <th class="px-3 py-2">Units</th>
+                  <th class="px-3 py-2">SoS %</th>
                 </tr>
               </thead>
               <tbody id="sos-table-body" class="divide-y divide-gray-100"></tbody>
@@ -452,9 +450,14 @@ async function loadProducts() {
     empty.classList.add('hidden');
     tbody.innerHTML = prods.map(p => `
       <tr class="hover:bg-gray-50">
+        <td class="px-3 py-2 font-medium text-gray-800">${escHtml(p.brand || '')}</td>
         <td class="px-3 py-2 text-gray-800">${escHtml(p.name)}</td>
-        <td class="px-3 py-2 text-gray-600">${escHtml(p.brand || '')}</td>
-        <td class="px-3 py-2 text-gray-600">$${Number(p.unit_price).toFixed(2)}</td>
+        <td class="px-3 py-2 text-gray-500 text-xs font-mono">${escHtml(p.sku_code || '—')}</td>
+        <td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">${escHtml(p.pack_type || '—')}</span></td>
+        <td class="px-3 py-2 text-gray-600">${escHtml(p.size_label || '—')}</td>
+        <td class="px-3 py-2 text-gray-600">${escHtml(p.unit_type || '—')}</td>
+        <td class="px-3 py-2 text-gray-600">${escHtml(p.category || '—')}</td>
+        <td class="px-3 py-2"><span class="px-1.5 py-0.5 ${p.placement === 'CHILLED' ? 'bg-cyan-50 text-cyan-700' : p.placement === 'FROZEN' ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-600'} rounded text-xs">${escHtml(p.placement || '—')}</span></td>
       </tr>
     `).join('');
   } catch (e) {
@@ -462,28 +465,6 @@ async function loadProducts() {
   }
 }
 
-async function upsertProduct() {
-  const name = document.getElementById('prod-name').value.trim();
-  const brand = document.getElementById('prod-brand').value.trim();
-  const unit_price = parseFloat(document.getElementById('prod-price').value) || 0;
-  if (!name) { showError('prod-error', 'Product name is required.'); return; }
-
-  try {
-    const res = await fetch('/api/products', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, brand, unit_price }),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    document.getElementById('prod-name').value = '';
-    document.getElementById('prod-brand').value = '';
-    document.getElementById('prod-price').value = '';
-    showSuccess('prod-success', 'Product saved successfully.');
-    loadProducts();
-  } catch (e) {
-    showError('prod-error', 'Error: ' + e.message);
-  }
-}
 
 // ── Upload & AI analysis ──────────────────────────────────────────────────
 async function submitUpload() {
@@ -528,9 +509,16 @@ function renderAnalysisResult(data) {
   const tbody = document.getElementById('analysis-table-body');
   tbody.innerHTML = products.map(p => `
     <tr class="hover:bg-gray-50">
+      <td class="px-3 py-2 font-medium text-gray-800">${escHtml(p.brand || '')}</td>
       <td class="px-3 py-2 text-gray-800">${escHtml(p.name)}</td>
-      <td class="px-3 py-2 text-gray-600">${escHtml(p.brand || '')}</td>
-      <td class="px-3 py-2 text-gray-600">${p.unit_count}</td>
+      <td class="px-3 py-2"><span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded text-xs">${escHtml(p.pack_type || '')}</span></td>
+      <td class="px-3 py-2 text-gray-600">${escHtml(p.size_label || '—')}</td>
+      <td class="px-3 py-2 text-gray-600">${escHtml(p.category || '')}</td>
+      <td class="px-3 py-2"><span class="px-1.5 py-0.5 ${p.placement === 'CHILLED' ? 'bg-cyan-50 text-cyan-700' : p.placement === 'FROZEN' ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-600'} rounded text-xs">${escHtml(p.placement || '')}</span></td>
+      <td class="px-3 py-2 text-gray-800 font-medium">${p.price_per_unit != null ? '$' + Number(p.price_per_unit).toFixed(2) : '—'}</td>
+      <td class="px-3 py-2 text-gray-600">${p.price_per_ltr != null ? '$' + Number(p.price_per_ltr).toFixed(2) : '—'}</td>
+      <td class="px-3 py-2 text-center text-gray-800">${p.num_facings ?? '—'}</td>
+      <td class="px-3 py-2 text-center text-gray-800">${p.unit_count}</td>
       <td class="px-3 py-2 text-gray-600">${Number(p.shelf_space_pct).toFixed(1)}%</td>
       <td class="px-3 py-2">
         <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium ${confidenceBadge(p.confidence)}">
@@ -618,16 +606,19 @@ async function runSalesAnalysis() {
     empty.classList.add('hidden');
     tbody.innerHTML = data.map(r => `
       <tr class="hover:bg-gray-50">
+        <td class="px-3 py-2 font-medium text-gray-800">${escHtml(r.brand || '')}</td>
         <td class="px-3 py-2 text-gray-800">${escHtml(r.product_name || '')}</td>
-        <td class="px-3 py-2 text-gray-600">${escHtml(r.brand || '')}</td>
+        <td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">${escHtml(r.pack_type || '—')}</span></td>
+        <td class="px-3 py-2 text-gray-600">${escHtml(r.category || '—')}</td>
         <td class="px-3 py-2 text-gray-500 text-xs">${formatDate(r.period_start)} &rarr; ${formatDate(r.period_end)}</td>
-        <td class="px-3 py-2 text-gray-800 font-medium">${r.units_sold}</td>
+        <td class="px-3 py-2 text-gray-800 font-medium text-center">${r.units_sold}</td>
+        <td class="px-3 py-2 text-gray-700">${r.price_per_unit ? '$' + Number(r.price_per_unit).toFixed(2) : '—'}</td>
+        <td class="px-3 py-2 font-medium text-green-700">$${Number(r.revenue_estimate).toFixed(2)}</td>
         <td class="px-3 py-2">
           ${r.replenishment_detected
-            ? '<span class="inline-block px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-700">Yes</span>'
+            ? '<span class="inline-block px-2 py-0.5 rounded-full text-xs bg-amber-100 text-amber-700">Yes</span>'
             : '<span class="inline-block px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-600">No</span>'}
         </td>
-        <td class="px-3 py-2 text-gray-800">$${Number(r.revenue_estimate).toFixed(2)}</td>
       </tr>
     `).join('');
   } catch (e) {
@@ -658,10 +649,16 @@ async function runShareOfShelf() {
     const tbody = document.getElementById('sos-table-body');
     tbody.innerHTML = products.map(p => `
       <tr class="hover:bg-gray-50">
+        <td class="px-3 py-2 font-medium text-gray-800">${escHtml(p.brand || '')}</td>
         <td class="px-3 py-2 text-gray-800">${escHtml(p.name)}</td>
-        <td class="px-3 py-2 text-gray-600">${escHtml(p.brand || '')}</td>
-        <td class="px-3 py-2 text-gray-600">${Number(p.shelf_space_pct).toFixed(1)}%</td>
-        <td class="px-3 py-2 text-gray-600">${p.unit_count}</td>
+        <td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 bg-blue-50 text-blue-700 rounded">${escHtml(p.pack_type || '—')}</span></td>
+        <td class="px-3 py-2 text-gray-600">${escHtml(p.size_label || '—')}</td>
+        <td class="px-3 py-2 text-xs"><span class="px-1.5 py-0.5 ${p.placement === 'CHILLED' ? 'bg-cyan-50 text-cyan-700' : p.placement === 'FROZEN' ? 'bg-indigo-50 text-indigo-700' : 'bg-gray-100 text-gray-600'} rounded">${escHtml(p.placement || '—')}</span></td>
+        <td class="px-3 py-2 font-medium text-gray-800">${p.price_per_unit != null ? '$' + Number(p.price_per_unit).toFixed(2) : '—'}</td>
+        <td class="px-3 py-2 text-gray-600">${p.price_per_ltr != null ? '$' + Number(p.price_per_ltr).toFixed(2) : '—'}</td>
+        <td class="px-3 py-2 text-center text-gray-800">${p.num_facings ?? '—'}</td>
+        <td class="px-3 py-2 text-center text-gray-800">${p.unit_count}</td>
+        <td class="px-3 py-2 font-medium text-indigo-700">${Number(p.shelf_space_pct).toFixed(1)}%</td>
       </tr>
     `).join('');
 
