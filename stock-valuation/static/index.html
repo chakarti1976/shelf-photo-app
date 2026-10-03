@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Оценка на акции</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>Оценка на акции</h1>
+  <form id="search">
+    <input id="ticker" placeholder="Тикер, напр. AAPL" autocomplete="off" required>
+    <input id="peers" placeholder="Сравними компании (по избор): MSFT,GOOGL" autocomplete="off">
+    <button type="submit">Оцени</button>
+  </form>
+  <p class="hint">Данните се попълват автоматично от Finviz, Yahoo Finance, SEC EDGAR и FRED (безплатни, без регистрация).
+    <span class="yellow-chip">Жълтите полета</span> могат да се променят — всичко се преизчислява веднага.</p>
+</header>
+
+<main id="app">
+  <p id="status" class="status">Въведи тикер и натисни „Оцени“.</p>
+  <div id="content" hidden></div>
+</main>
+
+<script type="module" src="/static/app.js"></script>
+</body>
+</html>

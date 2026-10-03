@@ -1,0 +1,71 @@
+:root {
+  --bg: #f5f6f8; --card: #fff; --text: #1d2330; --muted: #667085; --line: #e3e6eb;
+  --accent: #2456d6; --buy: #11804a; --buy-bg: #e3f5eb; --sell: #c0332b; --sell-bg: #fbe7e5;
+  --yellow: #fff6c2; --yellow-line: #e6cf55; --missing: #ffd9d6;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #12151b; --card: #1b1f27; --text: #e7e9ee; --muted: #9aa3b2; --line: #2c323d;
+    --accent: #7aa2ff; --buy: #4cd18b; --buy-bg: #163626; --sell: #ff8077; --sell-bg: #3d1d1b;
+    --yellow: #3b3415; --yellow-line: #8a7a2b; --missing: #4a2422; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text); }
+header { padding: 20px 16px 8px; max-width: 1200px; margin: 0 auto; }
+h1 { margin: 0 0 12px; font-size: 24px; }
+h2 { margin: 0 0 12px; font-size: 18px; }
+h3 { margin: 16px 0 8px; font-size: 15px; color: var(--muted); font-weight: 600; }
+#search { display: flex; gap: 8px; flex-wrap: wrap; }
+#search input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 16px;
+  background: var(--card); color: var(--text); }
+#ticker { width: 180px; text-transform: uppercase; }
+#peers { flex: 1; min-width: 220px; }
+button { padding: 10px 18px; border: 0; border-radius: 8px; background: var(--accent); color: #fff;
+  font-size: 15px; cursor: pointer; }
+button:disabled { opacity: .6; cursor: wait; }
+.hint { color: var(--muted); font-size: 13px; }
+.yellow-chip { background: var(--yellow); border: 1px solid var(--yellow-line); padding: 0 6px; border-radius: 4px; color: var(--text); }
+main { max-width: 1200px; margin: 0 auto; padding: 0 16px 40px; }
+.status { color: var(--muted); }
+.status.error { color: var(--sell); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin: 14px 0; }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); }
+.grid > .card { margin: 0; }
+.hero { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
+.hero .name { font-size: 22px; font-weight: 700; }
+.hero .sub { color: var(--muted); font-size: 13px; }
+.big { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.kpis { display: flex; gap: 24px; flex-wrap: wrap; }
+.kpi .label { color: var(--muted); font-size: 12px; }
+.badge { display: inline-block; padding: 3px 12px; border-radius: 999px; font-weight: 700; }
+.badge.buy { background: var(--buy-bg); color: var(--buy); }
+.badge.sell { background: var(--sell-bg); color: var(--sell); }
+.badge.big-badge { font-size: 20px; padding: 6px 20px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+td, th { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+td:first-child, th:first-child { text-align: left; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; }
+.scroll { overflow-x: auto; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 5px 0;
+  border-bottom: 1px dashed var(--line); }
+.row:last-child { border-bottom: 0; }
+.row .src { color: var(--muted); font-size: 11px; margin-left: 6px; }
+.row label { flex: 1; }
+input.y { width: 110px; padding: 4px 6px; text-align: right; font: inherit; font-variant-numeric: tabular-nums;
+  background: var(--yellow); border: 1px solid var(--yellow-line); border-radius: 5px; color: var(--text); }
+input.y.missing { background: var(--missing); }
+input.y.narrow { width: 80px; }
+.out { font-weight: 700; }
+.pos { color: var(--buy); } .neg { color: var(--sell); }
+.metrics { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+.metric { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+.metric .label { color: var(--muted); font-size: 12px; }
+.metric .val { font-weight: 600; font-variant-numeric: tabular-nums; }
+.warn { background: var(--sell-bg); color: var(--text); border-color: var(--sell); }
+.warn li { font-size: 13px; }
+.note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { background: transparent; color: var(--text); border-radius: 0; padding: 6px 12px; font-size: 13px; }
+.seg button.on { background: var(--accent); color: #fff; }
+svg.spark { width: 260px; height: 60px; }
+@media (max-width: 600px) { #ticker { width: 100%; } .big { font-size: 24px; } }
