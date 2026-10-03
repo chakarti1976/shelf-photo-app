@@ -1,0 +1,13 @@
+# One-click deploy of the stock valuation app on Render (free plan).
+services:
+  - type: web
+    name: stock-valuation
+    runtime: python
+    plan: free
+    rootDir: stock-valuation
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"

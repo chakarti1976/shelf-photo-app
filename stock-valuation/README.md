@@ -14,6 +14,15 @@
 
 След това отвори http://localhost:8000 (на Windows се отваря сам).
 
+## Онлайн (без локално стартиране)
+
+Бутонът качва приложението безплатно в Render.com (нужна е регистрация с GitHub акаунт):
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/chakarti1976/shelf-photo-app/tree/claude/sweet-johnson-03cvid)
+
+Render дава адрес от вида `https://stock-valuation-xxxx.onrender.com`. Безплатният план „заспива“
+след 15 мин. без посещения — първото отваряне след това отнема около минута.
+
 ## Откъде идват данните
 
 | Данни | Източник |
