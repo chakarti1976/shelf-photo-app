@@ -19,8 +19,27 @@
 </header>
 
 <main id="app">
-  <p id="status" class="status">Въведи тикер и натисни „Оцени“.</p>
-  <div id="content" hidden></div>
+  <nav class="seg tabs">
+    <button type="button" data-view="calc" class="on">Оценка</button>
+    <button type="button" data-view="saved">Запазени оценки</button>
+  </nav>
+  <div id="calcView">
+    <p id="status" class="status">Въведи тикер и натисни „Оцени“.</p>
+    <div id="content" hidden></div>
+  </div>
+  <section id="savedView" class="card" hidden>
+    <div class="savedhead">
+      <h2>Запазени оценки <span id="savedCount" class="sub"></span></h2>
+      <input id="savedFilter" placeholder="Търси по тикер или име" autocomplete="off">
+      <button type="button" id="exportCsv" class="ghost">Свали в Excel (CSV)</button>
+    </div>
+    <p id="storageWarn" class="warn-inline" hidden>Внимание: базата е временна (няма зададен DATABASE_URL) — записите ще изчезнат при рестарт на сървъра. Виж README → „База данни“.</p>
+    <div class="scroll"><table>
+      <thead><tr><th>Дата</th><th class="left">Акция</th><th>Цена тогава</th><th>Реална стойност</th><th>Цена за покупка</th>
+        <th title="Цена тогава спрямо цената за покупка">Разлика</th><th>Резултат</th><th class="left">Бележка</th><th></th><th></th></tr></thead>
+      <tbody id="savedBody"></tbody>
+    </table></div>
+  </section>
 </main>
 
 <script type="module" src="/static/app.js"></script>

@@ -11,3 +11,10 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.11.9"
+      # Free Postgres connection string (e.g. from neon.tech) — keeps saved
+      # valuations across restarts. Render asks for it on first deploy.
+      - key: DATABASE_URL
+        sync: false
+      # Optional: password for the whole site (leave empty for none).
+      - key: APP_PASSWORD
+        sync: false

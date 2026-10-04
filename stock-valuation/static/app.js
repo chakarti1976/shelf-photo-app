@@ -9,6 +9,8 @@ let D = null;   // data from /api/data
 let I = {};     // current inputs (fractions for percentages)
 let SRC = {};   // where each default came from
 let method = "simple";
+let lastR = null;     // latest computed results, used when saving
+let savedAt = null;   // set while viewing a saved valuation
 
 // ------------------------------------------------------------ formatting
 const nf = (d) => new Intl.NumberFormat("bg-BG", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -200,10 +202,16 @@ function layout() {
       ${sparkline(y.history)}
     </div>
     <div class="kpis">
-      <div class="kpi"><div class="label">Настояща цена</div><div class="big">${fmt.money(I.price)}</div></div>
+      <div class="kpi"><div class="label">${savedAt ? "Цена към " + fmtDate(savedAt) : "Настояща цена"}</div><div class="big">${fmt.money(I.price)}</div></div>
       <div class="kpi"><div class="label">Реална стойност</div><div class="big">${o("fair", "money")}</div></div>
       <div class="kpi"><div class="label">Приемлива цена за покупка</div><div class="big">${o("final.buy", "money")}</div></div>
       <div class="kpi"><div class="label">Решение</div><div>${o("final.signal", "signalBig")}</div></div>
+    </div>
+    <div class="savebar">
+      ${savedAt ? `<span class="saved-tag">Запазена оценка от ${fmtDate(savedAt)}</span>` : ""}
+      <input id="note" placeholder="Бележка (по избор)" maxlength="300">
+      <button type="button" id="saveBtn">Запази оценката</button>
+      <span id="saveMsg" class="note"></span>
     </div>
   </section>
 
@@ -406,7 +414,7 @@ document.addEventListener("click", (e) => {
   if (m) { method = m; document.querySelectorAll("[data-method]").forEach((b) => b.classList.toggle("on", b.dataset.method === m)); full(); }
 });
 
-function full() { const R = compute(); R.growthEcho = I.growthG; render(R); }
+function full() { const R = compute(); R.growthEcho = I.growthG; render(R); lastR = R; }
 
 $("#search").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -424,6 +432,8 @@ $("#search").addEventListener("submit", async (e) => {
     if (!D.yahoo && !D.finviz) throw new Error("Няма данни за този тикер. Провери го (за европейски борси напр. SAP.DE).");
     D.currency = D.yahoo?.currency || "USD";
     ({ in_: I, src: SRC } = defaults(D));
+    savedAt = null;
+    showView("calc");
     layout();
     full();
     $("#status").textContent = "";
@@ -438,3 +448,120 @@ $("#search").addEventListener("submit", async (e) => {
 });
 
 try { const t = localStorage.getItem("lastTicker"); if (t) $("#ticker").value = t; } catch { /* ignore */ }
+
+// ------------------------------------------------------------ saved valuations
+const fmtDate = (iso) => new Date(iso).toLocaleString("bg-BG", { dateStyle: "short", timeStyle: "short" });
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const MODEL_LABELS = { graham: "Греъм", multiple: "Множител", dcf: "DCF", ev: "EV/EBITDA", ddm: "Дивидент", lynch: "Линч" };
+let saved = [];
+
+function showView(v) {
+  $("#calcView").hidden = v !== "calc";
+  $("#savedView").hidden = v !== "saved";
+  document.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("on", b.dataset.view === v));
+  if (v === "saved") loadSaved();
+}
+document.querySelectorAll("[data-view]").forEach((b) => b.addEventListener("click", () => showView(b.dataset.view)));
+
+async function saveCurrent() {
+  if (!D || !lastR) return;
+  const btn = $("#saveBtn");
+  btn.disabled = true;
+  const f = D.finviz || {}, y = D.yahoo || {};
+  const body = {
+    ticker: D.ticker, name: f.name || y.name || D.sec?.entityName || D.ticker, currency: D.currency,
+    price: I.price, fairValue: lastR.fair, buyPrice: lastR.final.buy, signal: lastR.final.signal,
+    method, note: $("#note").value.trim() || null,
+    models: Object.fromEntries(Object.entries(lastR.values).map(([k, v]) => [k, ok(v) ? v : null])),
+    inputs: { values: I, src: SRC }, data: D,
+  };
+  try {
+    const r = await fetch("/api/valuations", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error((await r.json()).detail || r.statusText);
+    $("#saveMsg").textContent = "Запазено ✓";
+  } catch (err) {
+    $("#saveMsg").textContent = "Грешка при запис: " + err.message;
+  } finally {
+    btn.disabled = false;
+  }
+}
+document.addEventListener("click", (e) => { if (e.target.id === "saveBtn") saveCurrent(); });
+
+async function loadSaved() {
+  $("#savedBody").innerHTML = `<tr><td colspan="10">Зареждам…</td></tr>`;
+  try {
+    const r = await fetch("/api/valuations");
+    const j = await r.json();
+    saved = j.items;
+    $("#storageWarn").hidden = j.storage.persistent;
+    renderSaved();
+  } catch (err) {
+    $("#savedBody").innerHTML = `<tr><td colspan="10" class="neg">Грешка: ${esc(err.message)}</td></tr>`;
+  }
+}
+
+function renderSaved() {
+  const q = $("#savedFilter").value.trim().toUpperCase();
+  const rows = saved.filter((v) => !q || v.ticker.includes(q) || (v.name || "").toUpperCase().includes(q));
+  const money = (x, cur) => (ok(x) ? nf(2).format(x) + " " + (cur || "") : "—");
+  $("#savedBody").innerHTML = rows.map((v) => {
+    const gap = ok(v.price) && ok(v.buy_price) && v.buy_price > 0 ? (v.price - v.buy_price) / v.buy_price : null;
+    const models = Object.entries(v.models || {}).filter(([, x]) => ok(x))
+      .map(([k, x]) => `${MODEL_LABELS[k] || k}: ${nf(2).format(x)}`).join(" · ");
+    return `<tr>
+      <td>${fmtDate(v.created_at)}</td>
+      <td class="left"><b>${esc(v.ticker)}</b><div class="sub">${esc(v.name)}</div></td>
+      <td>${money(v.price, v.currency)}</td>
+      <td title="${esc(models)}">${money(v.fair_value, v.currency)}</td>
+      <td>${money(v.buy_price, v.currency)}</td>
+      <td>${diffHTML(gap)}</td>
+      <td>${signalHTML(v.signal)}</td>
+      <td class="left">${esc(v.note)}</td>
+      <td><button type="button" class="small" data-open="${v.id}">Отвори</button></td>
+      <td><button type="button" class="small ghost" data-del="${v.id}" title="Изтрий">✕</button></td></tr>`;
+  }).join("") || `<tr><td colspan="10">Още няма запазени оценки. Направи оценка и натисни „Запази оценката“.</td></tr>`;
+  $("#savedCount").textContent = rows.length ? `${rows.length} записа` : "";
+}
+document.addEventListener("input", (e) => { if (e.target.id === "savedFilter") renderSaved(); });
+
+document.addEventListener("click", async (e) => {
+  const openId = e.target.dataset?.open, delId = e.target.dataset?.del;
+  if (openId) {
+    const r = await fetch(`/api/valuations/${openId}`);
+    if (!r.ok) return;
+    const v = await r.json();
+    D = v.data; I = v.inputs.values; SRC = v.inputs.src || {}; method = v.method || "simple"; savedAt = v.created_at;
+    $("#ticker").value = v.ticker;
+    showView("calc");
+    layout();
+    full();
+    if (v.note) $("#note").value = v.note;
+    $("#status").textContent = "";
+    $("#content").hidden = false;
+    window.scrollTo(0, 0);
+  } else if (delId) {
+    const v = saved.find((x) => String(x.id) === delId);
+    if (!confirm(`Да изтрия ли оценката на ${v?.ticker} от ${v ? fmtDate(v.created_at) : ""}?`)) return;
+    const r = await fetch(`/api/valuations/${delId}`, { method: "DELETE" });
+    if (r.ok) { saved = saved.filter((x) => String(x.id) !== delId); renderSaved(); }
+  }
+});
+
+$("#exportCsv").addEventListener("click", () => {
+  const head = ["Дата", "Тикер", "Компания", "Валута", "Цена", "Реална стойност", "Цена за покупка", "Резултат", "Метод", "Бележка",
+    ...Object.values(MODEL_LABELS)];
+  // Bulgarian Excel expects ";" between columns and a decimal comma.
+  const cellCsv = (x) => {
+    if (x == null) return "";
+    if (typeof x === "number") return String(+x.toFixed(4)).replace(".", ",");
+    return /[";\n]/.test(String(x)) ? `"${String(x).replace(/"/g, '""')}"` : String(x);
+  };
+  const lines = saved.map((v) => [fmtDate(v.created_at), v.ticker, v.name, v.currency, v.price, v.fair_value, v.buy_price, v.signal,
+    v.method === "weighted" ? "претеглено" : "средно", v.note, ...Object.keys(MODEL_LABELS).map((k) => v.models?.[k])].map(cellCsv).join(";"));
+  const blob = new Blob(["﻿" + [head.join(";"), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `ocenki-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});

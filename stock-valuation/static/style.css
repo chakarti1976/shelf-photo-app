@@ -67,5 +67,18 @@ input.y.narrow { width: 80px; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
 .seg button { background: transparent; color: var(--text); border-radius: 0; padding: 6px 12px; font-size: 13px; }
 .seg button.on { background: var(--accent); color: #fff; }
+.tabs { margin: 4px 0 6px; }
+.savebar { flex-basis: 100%; display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  border-top: 1px solid var(--line); padding-top: 12px; }
+.savebar input, #savedFilter { flex: 1; min-width: 180px; padding: 8px 10px; border: 1px solid var(--line);
+  border-radius: 8px; background: var(--card); color: var(--text); font: inherit; }
+.saved-tag { background: var(--yellow); border: 1px solid var(--yellow-line); padding: 3px 10px; border-radius: 999px; font-size: 13px; }
+.savedhead { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+.savedhead h2 { margin: 0; flex: 1; }
+button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); }
+button.small { padding: 4px 10px; font-size: 13px; }
+td.left, th.left { text-align: left; }
+td .sub { color: var(--muted); font-size: 12px; }
+.warn-inline { background: var(--sell-bg); border: 1px solid var(--sell); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
 svg.spark { width: 260px; height: 60px; }
 @media (max-width: 600px) { #ticker { width: 100%; } .big { font-size: 24px; } }
